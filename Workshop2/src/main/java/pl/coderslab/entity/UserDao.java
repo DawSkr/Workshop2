@@ -89,7 +89,7 @@ public class UserDao {
         try (Connection conn = DbUtil.getConnection()) {
             Scanner scanner = new Scanner(System.in);
             PreparedStatement statement = conn.prepareStatement(DELETE_USER_QUERY);
-            System.out.println("Podaj ID użytkownika");
+            System.out.println("Podaj ID użytkownika do skasowania");
             statement.setInt(1, scanner.nextInt());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -120,7 +120,9 @@ public class UserDao {
 
     public User[] findEmail() {
         try (Connection conn = DbUtil.getConnection()) {
-            String keyword = "gmail";
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Podaj domenę email której szukamy?");
+            String keyword = scanner.nextLine();
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM users WHERE email LIKE ?");
             statement.setString(1, "%" + keyword + "%");
             ResultSet resultSet = statement.executeQuery();
@@ -139,9 +141,9 @@ public class UserDao {
 
 
     private User[] getUsers(ResultSet resultSet) throws SQLException {
-        User user = new User();
         User[] users = new User[0];
         while (resultSet.next()) {
+            User user = new User();
             user.setId(resultSet.getInt("id"));
             user.setEmail(resultSet.getString("email"));
             user.setUserName(resultSet.getString("username"));

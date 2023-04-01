@@ -2,24 +2,23 @@ package pl.coderslab;
 
 import pl.coderslab.entity.User;
 import pl.coderslab.entity.UserDao;
-
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-
         showMenu();
         chooseMenuOption();
     }
 
     private static void showMenu() {
         System.out.println("Proszę wybierz opcję:");
-        String[] menu = {"Create", "Delete", "Update", "Find", "Exit"};
+        String[] menu = {"Create ", "Delete ", "Update ", "Find ", "FindEmail ", "Exit "};
         for (String element : menu) {
-            System.out.println(element);
+            System.out.print(element);
         }
+        System.out.println();
     }
 
     private static void chooseMenuOption() {
@@ -32,12 +31,27 @@ public class Main {
                     break;
                 case "Delete":
                     removeUser();
+                    showMenu();
+                    chooseMenuOption();
                     break;
                 case "Update":
                     updateUser();
+                    showMenu();
+                    chooseMenuOption();
                     break;
                 case "Find":
                     findAll();
+                    break;
+                case "FindEmail":
+                    UserDao userDao = new UserDao();
+                    User[] users = userDao.findEmail();
+                    if (users.length > 0) {
+                        System.out.println(Arrays.toString(users));
+                    } else {
+                        System.out.println("Nie znaleziono użytkowników o podanym emailu");
+                    }
+                    showMenu();
+                    chooseMenuOption();
                     break;
                 case "Exit":
                     System.out.println("Wybrano opcje wyjdź");
@@ -54,11 +68,9 @@ public class Main {
         System.exit(0);
     }
 
-    private static void removeUser(){
-        Scanner scanner = new Scanner(System.in);
+    private static void removeUser() {
         UserDao userDao = new UserDao();
-        userDao.read(1);
-        userDao.delete(1);
+        userDao.delete(0);
         showMenu();
         chooseMenuOption();
     }
@@ -77,21 +89,29 @@ public class Main {
         showMenu();
         chooseMenuOption();
     }
+
     private static void updateUser() {
+        Scanner scanner = new Scanner(System.in);
         UserDao userDao = new UserDao();
-        User user = userDao.read(1);
-        user.setUserName("Michał");
+        System.out.println("Podaj ID które będziemy zmieniać: ");
+        User user = userDao.read(scanner.nextInt());
+        System.out.println("Na jakie imie zmieniamy:");
+        scanner.nextLine();
+        String newName = scanner.nextLine();
+        user.setUserName(newName);
         userDao.update(user);
-        User userUpdated = userDao.read(1);
-        System.out.println(userUpdated.getId() + " " + userUpdated.getUserName() + userUpdated.getEmail() + userUpdated.getPassword());
+//        User userUpdated = userDao.read(1);
+//        System.out.println(userUpdated.getId() + " " + userUpdated.getUserName() + userUpdated.getEmail() + userUpdated.getPassword());
     }
 
-    private static void findAll(){
+    private static void findAll() {
         UserDao userDao = new UserDao();
         User[] users = userDao.findAll();
-        for (int i = 0; i < users.length; i++){
-            System.out.println();
-            System.out.print(users[i]);
+        for (int i = 0; i < users.length; i++) {
+            System.out.println(users[i]);
         }
+        System.out.println();
+        showMenu();
+        chooseMenuOption();
     }
 }
