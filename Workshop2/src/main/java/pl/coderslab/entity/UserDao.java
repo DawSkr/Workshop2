@@ -5,6 +5,7 @@ import pl.coderslab.DbUtil;
 
 import java.sql.*;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class UserDao {
     private static final String CREATE_USER_QUERY =
@@ -18,6 +19,9 @@ public class UserDao {
 
     private static final String DELETE_USER_QUERY =
             "DELETE FROM users WHERE id = ?";
+
+    private static final String DELETEUSERNAME_USER_QUERY =
+            "DELETE FROM users WHERE username = ?";
 
     private static final String FIND_ALL_USER_QUERY = "SELECT * FROM users";
 
@@ -83,8 +87,20 @@ public class UserDao {
 
     public void delete(int userId) {
         try (Connection conn = DbUtil.getConnection()) {
+            Scanner scanner = new Scanner(System.in);
             PreparedStatement statement = conn.prepareStatement(DELETE_USER_QUERY);
-            statement.setInt(1, userId);
+            System.out.println("Podaj ID użytkownika");
+            statement.setInt(1, scanner.nextInt());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteUsername(String username) {
+        try (Connection conn = DbUtil.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(DELETEUSERNAME_USER_QUERY);
+            statement.setString(1, "Tomasz");
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,6 +110,19 @@ public class UserDao {
     public User[] findAll() {
         try (Connection conn = DbUtil.getConnection()) {
             PreparedStatement statement = conn.prepareStatement(FIND_ALL_USER_QUERY);
+            ResultSet resultSet = statement.executeQuery();
+            return getUsers(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public User[] findEmail() {
+        try (Connection conn = DbUtil.getConnection()) {
+            String keyword = "gmail";
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM users WHERE email LIKE ?");
+            statement.setString(1, "%" + keyword + "%");
             ResultSet resultSet = statement.executeQuery();
             return getUsers(resultSet);
         } catch (SQLException e) {
@@ -121,5 +150,4 @@ public class UserDao {
         }
         return users;
     }
-
 }
